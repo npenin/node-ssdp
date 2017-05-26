@@ -33,7 +33,7 @@ import * as Promise from 'bluebird'
 export class SsdpServer  extends SSDP
 {
 
-    constructor(opts:SSDPOptions) {
+    constructor(opts?:SSDPOptions) {
       super(opts, 'node-ssdp:server');
     }
 

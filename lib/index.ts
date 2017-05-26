@@ -96,7 +96,7 @@ export type SSDPLogger = (message: string, ...args: any[]) => void;
  */
 export class SSDP extends EE
 {
-  constructor(opts: SSDPOptions, protected _subclass:string= 'ssdp-base')
+  constructor(opts?: SSDPOptions, protected _subclass:string= 'ssdp-base')
   {
     super();
     if (!(this instanceof SSDP))
