@@ -7,7 +7,7 @@ var SsdpBase = require('../../').Base
 describe('Base class', function () {
   context('getMethod helper', function () {
     it('returns correct method, lowercased', function () {
-      var ssdp = new SsdpBase
+      var ssdp = new SsdpBase();
 
       var message = [
         'BLAH URI HTTP/1.1',

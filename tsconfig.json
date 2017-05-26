@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        "rootDir": "lib",
+        "target": "es5",
+        "module": "commonjs"
+    }
+}

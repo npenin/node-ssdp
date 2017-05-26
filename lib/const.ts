@@ -1,5 +1,5 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict'
+
 /*
  MIT License
 
@@ -23,17 +23,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-exports.SSDP_ALIVE = 'ssdp:alive';
-exports.SSDP_BYE = 'ssdp:byebye';
-exports.SSDP_ALL = 'ssdp:all';
-exports.ADVERTISE_ALIVE = 'advertise-alive';
-exports.ADVERTISE_BYE = 'advertise-bye';
-exports.NOTIFY = 'notify';
-exports.M_SEARCH = 'm-search';
-exports.SSDP_DEFAULT_IP4 = '239.255.255.250';
-exports.SSDP_DEFAULT_IP6_NODE = 'FF01::C';
-exports.SSDP_DEFAULT_IP6_LINK = 'FF02::C';
-exports.SSDP_DEFAULT_IP6_SITE = 'FF05::C';
-exports.SSDP_DEFAULT_IP6_ORG = 'FF08::C';
-exports.SSDP_DEFAULT_IP6_GLOBAL = 'FF0E::C';
-exports.SSDP_DEFAULT_PORT = 1900;
+
+
+export var SSDP_ALIVE = 'ssdp:alive';
+export var SSDP_BYE = 'ssdp:byebye';
+export var SSDP_ALL = 'ssdp:all';
+export var ADVERTISE_ALIVE = 'advertise-alive';
+export var ADVERTISE_BYE = 'advertise-bye';
+export var NOTIFY = 'notify';
+export var M_SEARCH = 'm-search';
+export var SSDP_DEFAULT_IP4 = '239.255.255.250';
+export var SSDP_DEFAULT_IP6_NODE = 'FF01::C';
+export var SSDP_DEFAULT_IP6_LINK = 'FF02::C';
+export var SSDP_DEFAULT_IP6_SITE = 'FF05::C';
+export var SSDP_DEFAULT_IP6_ORG = 'FF08::C';
+export var SSDP_DEFAULT_IP6_GLOBAL = 'FF0E::C';
+export var SSDP_DEFAULT_PORT = 1900;

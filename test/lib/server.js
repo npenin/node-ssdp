@@ -168,7 +168,7 @@ describe('Server', function () {
         ssdpSig: 'signature',
         ttl: 'ttl',
         description: 'desc',
-        udn: 'device name'
+        udn: 'device name',
       })
 
       var iface = Object.keys(server.sockets)[0]
@@ -203,7 +203,7 @@ describe('Server', function () {
       assert.equal(headers1.NTS, 'ssdp:alive')
       assert.equal(headers1.USN, 'device name::tv/video')
       assert.equal(headers1.LOCATION, 'location header')
-      assert.equal(headers1['CACHE-CONTROL'], 'max-age=1800')
+      assert.equal(headers1['CACHE-CONTROL'], 'max-age=3')
       assert.equal(headers1.SERVER, 'signature')
 
       var port1 = args1[3]
@@ -223,7 +223,7 @@ describe('Server', function () {
       assert.equal(headers2.NTS, 'ssdp:alive')
       assert.equal(headers2.USN, 'device name')
       assert.equal(headers2.LOCATION, 'location header')
-      assert.equal(headers2['CACHE-CONTROL'], 'max-age=1800')
+      assert.equal(headers2['CACHE-CONTROL'], 'max-age=3')
       assert.equal(headers2.SERVER, 'signature')
 
       var port2 = args2[3]
@@ -285,7 +285,7 @@ describe('Server', function () {
       assert.equal(headers1.NTS, 'ssdp:alive')
       assert.equal(headers1.USN, 'device name::tv/video')
       assert.equal(headers1.LOCATION, 'location header')
-      assert.equal(headers1['CACHE-CONTROL'], 'max-age=1800')
+      assert.equal(headers1['CACHE-CONTROL'], 'max-age=3')
       assert.equal(headers1.SERVER, 'signature')
       assert.equal(headers1.FOO, 'bar')
       assert.equal(headers1.BAZ, 'qux')
@@ -307,7 +307,7 @@ describe('Server', function () {
       assert.equal(headers2.NTS, 'ssdp:alive')
       assert.equal(headers2.USN, 'device name')
       assert.equal(headers2.LOCATION, 'location header')
-      assert.equal(headers2['CACHE-CONTROL'], 'max-age=1800')
+      assert.equal(headers2['CACHE-CONTROL'], 'max-age=3')
       assert.equal(headers2.SERVER, 'signature')
       assert.equal(headers2.FOO, 'bar')
       assert.equal(headers2.BAZ, 'qux')
@@ -331,22 +331,21 @@ describe('Server', function () {
         location: 'location header',
         ttl: 'ttl',
         description: 'desc',
-        udn: 'device name'
+        udn: 'device name',
       })
 
       var iface = Object.keys(server.sockets)[0]
       var socket = server.sockets[iface]
 
       // avoid calling server.start
-
-      server._adLoopInterval = 1
-
       server.addUSN('tv/video')
+
+      server.start();
 
       server.stop()
 
       // server.sock.send should've been called 2 times with 2 unique args
-      assert.equal(socket.send.callCount, 1)
+      assert.equal(socket.send.callCount, 2, 'callcount')
 
       // argument order is:
       // message, _, message.length, ssdp port, ssdp host
