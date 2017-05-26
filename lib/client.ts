@@ -38,7 +38,7 @@ export class SsdpClient extends SSDP
      * @param opts
      * @constructor
      */
-    constructor(opts:SSDPOptions)
+    constructor(opts?:SSDPOptions)
     {
       super(opts, 'ssdp-client');
     }
