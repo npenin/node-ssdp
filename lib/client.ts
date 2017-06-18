@@ -25,7 +25,7 @@ SOFTWARE.
 import { SSDP, SSDPOptions } from './';
 import * as util from 'util'
 import * as c from './const'
-import * as Promise from 'bluebird';
+import * as Promise from 'bluebird'
 
 
 export class SsdpClient extends SSDP
@@ -35,35 +35,38 @@ export class SsdpClient extends SSDP
 	 * @param opts
 	 * @constructor
 	 */
-	constructor(opts?:SSDPOptions)
+	constructor(opts?: SSDPOptions)
 	{
-	super(opts, 'ssdp-client');
+		super(opts, 'ssdp-client');
 	}
 
 	/**
 	 * Start the listener for multicast notifications from SSDP devices
 	 * @param [cb]
 	 */
-	public start (cb?:(err?:any)=>void)
+	public start(cb?: (err?: any) => void)
 	{
-	var self = this;
-	return new Promise(function (success, failure)
-	{
-		function onBind(err)
+		var self = this;
+		return new Promise(function (success, failure)
 		{
-		if (cb) cb.apply(self, arguments)
-		if (err) return failure(err)
-		success()
-		}
-		self._start(onBind)
-	})
+			function onBind(err)
+			{
+				self._logger(err);
+				if (cb)
+					cb.apply(self, arguments)
+				if (err)
+					return failure(err)
+				success()
+			}
+			self._start(onBind)
+		})
 	}
 
 
 	/**
 	 *Close UDP socket.
 	 */
-	public stop ()
+	public stop()
 	{
 		this._stop()
 	}
@@ -74,7 +77,7 @@ export class SsdpClient extends SSDP
 	 * @param {String} serviceType
 	 * @returns {*}
 	 */
-	public search(serviceType:string)
+	public search(serviceType: string)
 	{
 		var self = this
 
@@ -89,10 +92,10 @@ export class SsdpClient extends SSDP
 		var pkt = self._getSSDPHeader(
 			c.M_SEARCH,
 			{
-			'HOST': self._ssdpServerHost,
-			'ST': serviceType,
-			'MAN': '"ssdp:discover"',
-			'MX': 3
+				'HOST': self._ssdpServerHost,
+				'ST': serviceType,
+				'MAN': '"ssdp:discover"',
+				'MX': 3
 			}
 		)
 

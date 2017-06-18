@@ -26,7 +26,7 @@
 import * as dgram from 'dgram';
 import { EventEmitter as EE } from 'events';
 import * as util from 'util';
-import * as ip from 'ip';
+import * as net from 'net'
 import * as os from 'os';
 import * as debug from 'debug';
 import * as async from 'async';
@@ -42,16 +42,16 @@ var nodeVersion = process.version.substr(1)
   , moduleName = require('../package.json').name
 
 export type Headers = {
-  MX?:number,
-  NTS?:string,
-  HOST?:string
-  MAN?:string;
-  ST?:string;
-  NT?:string;
-  USN?:string;
-  LOCATION?:string;
-  SERVER?:string;
-   };
+  MX?: number,
+  NTS?: string,
+  HOST?: string
+  MAN?: string;
+  ST?: string;
+  NT?: string;
+  USN?: string;
+  LOCATION?: string;
+  SERVER?: string;
+};
 
 export interface SSDPOptions
 {
@@ -70,7 +70,7 @@ export interface SSDPOptions
   reuseAddr?: boolean;
   location?: string | (() => string);
   suppressRootDeviceAdvertisements?: boolean
-  sourcePort: number;
+  sourcePort?: number;
 }
 
 export type SSDPLogger = (message: string, ...args: any[]) => void;
@@ -96,7 +96,7 @@ export type SSDPLogger = (message: string, ...args: any[]) => void;
  */
 export class SSDP extends EE
 {
-  constructor(opts?: SSDPOptions, protected _subclass:string= 'ssdp-base')
+  constructor(opts?: SSDPOptions, protected _subclass: string = 'ssdp-base')
   {
     super();
     if (!(this instanceof SSDP))
@@ -118,18 +118,19 @@ export class SSDP extends EE
 
 
     this._createSockets()
+    this._logger('sockets created')
+
   }
 
   protected options: SSDPOptions;
 
   protected _logger: SSDPLogger;
-  private _reuseAddr: boolean;
+  private _reuseAddr: boolean = true;
   protected _location: string;
   protected get _ssdpServerHost() { return this.options.ssdpIp + ':' + this.options.ssdpPort }
   protected _usns = {}
 
   private sockets: { [ip: string]: dgram.Socket } = {};
-  private socketsFamily: { [ip: string]: (4 | 6) } = {};
   protected _socketBound = false;
   protected _started = false;
 
@@ -151,7 +152,7 @@ export class SSDP extends EE
     } else
     {
       // Probably should specify these
-      this._location = opts.location || 'http://' + ip.address() + ':' + 10293 + '/upnp/desc.html'
+      this._location = opts.location;
     }
 
   }
@@ -179,38 +180,19 @@ export class SSDP extends EE
       {
         if (!ipInfo.internal)
         {
+          self._logger(<any>ipInfo);
           self._logger('Will use interface %s', iName)
           var socket: dgram.Socket;
-          switch (ipInfo.family)
-          {
-            case "IPv4":
-              if (parseFloat(process.version.replace(/\w/, '')) >= 0.12)
-              {
-                socket = dgram.createSocket({ type: 'udp4', reuseAddr: self._reuseAddr })
-              } else
-              {
-                socket = dgram.createSocket('udp4')
-              }
-              self.socketsFamily[ipInfo.address]=4;
-              break;
-            case "IPv6":
-              if (parseFloat(process.version.replace(/\w/, '')) >= 0.12)
-              {
-                socket = dgram.createSocket({ type: 'udp6', reuseAddr: self._reuseAddr })
-              } else
-              {
-                socket = dgram.createSocket('udp6')
-              }
-              self.socketsFamily[ipInfo.address]=6;
-          }
+          if (ipInfo.family == 'IPv4')
+            socket = dgram.createSocket({ type: <any>ipInfo.family.replace('IPv', 'udp'), reuseAddr: self._reuseAddr })
 
           if (socket)
           {
+            self._logger('unreferencing socket');
             socket.unref()
-
+            self._logger(ipInfo.address);
             self.sockets[ipInfo.address] = socket
           }
-
         }
       })
     })
@@ -259,9 +241,12 @@ export class SSDP extends EE
       return
     }
 
+    self._logger('starting');
+
     if (!this.sockets)
     {
       this._createSockets()
+      self._logger('sockets created')
     }
 
     self._started = true
@@ -270,8 +255,8 @@ export class SSDP extends EE
 
     async.each(interfaces, function (iface: string, next)
     {
-      var socket = self.sockets[iface]
-
+      var socket = self.sockets[iface];
+      self._logger('binding events on ' + iface);
       socket.on('error', function onSocketError(err)
       {
         self._logger('Socker error: %s', err.message)
@@ -279,6 +264,7 @@ export class SSDP extends EE
 
       socket.on('message', function onSocketMessage(msg, rinfo)
       {
+        self._logger('message %s', msg)
         self._parseMessage(msg, rinfo)
       })
 
@@ -290,21 +276,51 @@ export class SSDP extends EE
 
         try
         {
+
           if (self.options.ssdpIp)
             socket.addMembership(self.options.ssdpIp, iface) // TODO: specifying the interface in there might make a difference
-          else
-            switch (this.socketsFamily[iface])
+          else if (net.isIPv4(iface))
+          {
+            self._logger('adding membership to ssdp ipv4 (%s)', iface);
+            socket.addMembership(c.SSDP_DEFAULT_IP4, iface) // TODO: specifying the interface in there might make a difference
+          }
+          else if (net.isIPv6(iface))
+          {
+
+            switch (socket.address()['scopeid'])
             {
-              case 4:
-                socket.addMembership(c.SSDP_DEFAULT_IP4, iface) // TODO: specifying the interface in there might make a difference
-                break;
-              case 6:
+              case 1: //Interface-local scope spans only a single interface on a node, and is useful only for loopback transmission of multicast.
+
+              case 2: //Link-local and site-local multicast scopes span the same topological regions as the corresponding unicast scopes.
                 socket.addMembership(c.SSDP_DEFAULT_IP6_LINK, iface) // TODO: specifying the interface in there might make a difference
                 break;
+              case 3: //Realm-local multicast scope is originally defined in RFC 7346, larger than link-local, automatically determined by topology and must not be larger than the following scopes.
+              case 4: //Admin-local scope is the smallest scope that must be administratively configured, i.e., not automatically derived from physical connectivity or other, non- multicast-related configuration.
+                socket.addMembership(c.SSDP_DEFAULT_IP6_NODE, iface) // TODO: specifying the interface in there might make a difference
+                break;
+              case 5: //Link-local and site-local multicast scopes span the same topological regions as the corresponding unicast scopes.
+                socket.addMembership(c.SSDP_DEFAULT_IP6_SITE, iface) // TODO: specifying the interface in there might make a difference
+                break;
+              case 8: //Organization-local scope is intended to span multiple sites belonging to a single organization.
+                socket.addMembership(c.SSDP_DEFAULT_IP6_ORG, iface) // TODO: specifying the interface in there might make a difference
+                break;
+              case 0xe: //global
+                socket.addMembership(c.SSDP_DEFAULT_IP6_GLOBAL, iface) // TODO: specifying the interface in there might make a difference
+                break;
+              default:
+                self._logger('%o', socket.address());
             }
+          }
+          else
+          {
+            self._logger(iface + ' could not be identified as IPv4 nor as IPv6');
+            return;
+          }
+
           socket.setMulticastTTL(self.options.ssdpTtl)
         } catch (e)
         {
+          self._logger(e);
           if (e.code === 'ENODEV' || e.code === 'EADDRNOTAVAIL')
           {
             self._logger('Interface %s is not present to add multicast group membership. Scheduling a retry. Error: %s', addr, e.message)
@@ -316,12 +332,22 @@ export class SSDP extends EE
         }
       })
 
-      if (self.options.explicitSocketBind)
+      try
       {
-        socket.bind(self.options.sourcePort, iface, next)
-      } else
+        self._logger('binding socket ' + iface)
+        if (self.options.explicitSocketBind)
+        {
+          socket.bind({ port: self.options.sourcePort, address: iface, exclusive: true }, next)
+        } else
+        {
+          socket.bind({ port: self.options.sourcePort, exclusive: true }, next) // socket binds on 0.0.0.0
+        }
+        self._logger('bound socket ' + iface)
+      }
+      catch (e)
       {
-        socket.bind(self.options.sourcePort, next) // socket binds on 0.0.0.0
+        self._logger(e);
+        delete self.sockets[iface];
       }
     }, cb)
   }
@@ -357,7 +383,7 @@ export class SSDP extends EE
    * @param msg
    * @param rinfo
    */
-  private _parseCommand (msg:string, rinfo:dgram.RemoteInfo)
+  private _parseCommand(msg: string, rinfo: dgram.RemoteInfo)
   {
     var method = this._getMethod(msg)
       , headers = this._getHeaders(msg)
@@ -385,7 +411,7 @@ export class SSDP extends EE
    * @param msg
    * @param rinfo
    */
-  protected _notify (headers:Headers, msg, rinfo:dgram.RemoteInfo)
+  protected _notify(headers: Headers, msg, rinfo: dgram.RemoteInfo)
   {
     if (!headers.NTS)
     {
@@ -420,7 +446,7 @@ export class SSDP extends EE
    * @param msg
    * @param rinfo
    */
-  protected _msearch (headers:Headers, msg, rinfo:dgram.RemoteInfo)
+  protected _msearch(headers: Headers, msg, rinfo: dgram.RemoteInfo)
   {
     this._logger('SSDP M-SEARCH event: %o', { 'ST': headers.ST, 'address': rinfo.address, 'port': rinfo.port })
 
@@ -438,7 +464,7 @@ export class SSDP extends EE
    * @param {Object} rinfo Remote client's address
    * @private
    */
-  private _respondToSearch (serviceType:string, rinfo:dgram.RemoteInfo)
+  private _respondToSearch(serviceType: string, rinfo: dgram.RemoteInfo)
   {
     var self = this
       , peer_addr = rinfo.address
@@ -565,13 +591,13 @@ export class SSDP extends EE
 
   public _getStatusCode(msg: string)
   {
-    var indexOfFirstSpace=msg.indexOf(' ');
-    return parseInt(msg.substring(indexOfFirstSpace, msg.indexOf(' ', indexOfFirstSpace+1)));
+    var indexOfFirstSpace = msg.indexOf(' ');
+    return parseInt(msg.substring(indexOfFirstSpace, msg.indexOf(' ', indexOfFirstSpace + 1)));
   }
 
 
 
-  public _getHeaders(msg: string):Headers
+  public _getHeaders(msg: string): Headers
   {
     var lines = msg.split("\r\n")
 
@@ -582,8 +608,8 @@ export class SSDP extends EE
       if (line.length)
       {
         var pairs = line.match(ssdpHeader)
-        if (pairs) 
-        headers[pairs[1].toUpperCase()] = pairs[2] // e.g. {'HOST': 239.255.255.250:1900}
+        if (pairs)
+          headers[pairs[1].toUpperCase()] = pairs[2] // e.g. {'HOST': 239.255.255.250:1900}
       }
     });
 
@@ -608,21 +634,18 @@ export class SSDP extends EE
     async.each(ipAddresses, function (ipAddress, next)
     {
       var socket = self.sockets[ipAddress];
-      var ip=host;
-      if(!ip)
+      var ip = host;
+      if (!ip)
       {
-        switch(self.socketsFamily[ipAddress])
-        {
-          case 4:
-            ip=c.SSDP_DEFAULT_IP4;
-            break
-          case 6:
-            ip=c.SSDP_DEFAULT_IP6_LINK;
-            break;
-        }
-      }
+        if (net.isIPv4(ipAddress))
+          ip = c.SSDP_DEFAULT_IP4;
+        else if (net.isIPv6(ipAddress))
+          ip = c.SSDP_DEFAULT_IP6_LINK;
 
-      socket.send(message, 0, message.length, port, ip, next)
+
+      }
+      if (ip)
+        socket.send(message, 0, message.length, port, ip, next)
     }, cb)
   }
 }
