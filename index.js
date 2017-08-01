@@ -27,5 +27,6 @@ var path = process.env.SSDP_COV ? './lib-cov/' : './lib/'
 module.exports = {
   Server: require(path + 'server').SsdpServer,
   Client: require(path + 'client').SsdpClient,
-  Base: require(path + 'index').SSDP
+  Base: require(path + 'index').SSDP,
+  Const: require(path + 'const')
 }
