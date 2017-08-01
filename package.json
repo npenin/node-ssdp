@@ -11,6 +11,11 @@
   "version": "3.2.1",
   "author": "Ilya Shaisultanov <ilya.shaisultanov@gmail.com>",
   "dependencies": {
+    "@types/async": "^2.0.40",
+    "@types/bluebird": "^3.5.8",
+    "@types/debug": "0.0.29",
+    "@types/extend": "^2.0.30",
+    "@types/node": "^8.0.17",
     "async": "^2.1.4",
     "bluebird": "^3.4.7",
     "debug": "^2.3.3",
