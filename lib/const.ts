@@ -25,17 +25,17 @@
  */
 
 
-export var SSDP_ALIVE = 'ssdp:alive';
-export var SSDP_BYE = 'ssdp:byebye';
-export var SSDP_ALL = 'ssdp:all';
-export var ADVERTISE_ALIVE = 'advertise-alive';
-export var ADVERTISE_BYE = 'advertise-bye';
-export var NOTIFY = 'notify';
-export var M_SEARCH = 'm-search';
-export var SSDP_DEFAULT_IP4 = '239.255.255.250';
-export var SSDP_DEFAULT_IP6_NODE = 'FF01::C';
-export var SSDP_DEFAULT_IP6_LINK = 'FF02::C';
-export var SSDP_DEFAULT_IP6_SITE = 'FF05::C';
-export var SSDP_DEFAULT_IP6_ORG = 'FF08::C';
-export var SSDP_DEFAULT_IP6_GLOBAL = 'FF0E::C';
-export var SSDP_DEFAULT_PORT = 1900;
+export const SSDP_ALIVE = 'ssdp:alive';
+export const SSDP_BYE = 'ssdp:byebye';
+export const SSDP_ALL = 'ssdp:all';
+export const ADVERTISE_ALIVE = 'advertise-alive';
+export const ADVERTISE_BYE = 'advertise-bye';
+export const NOTIFY = 'notify';
+export const M_SEARCH = 'm-search';
+export const SSDP_DEFAULT_IP4 = '239.255.255.250';
+export const SSDP_DEFAULT_IP6_NODE = 'FF01::C';
+export const SSDP_DEFAULT_IP6_LINK = 'FF02::C';
+export const SSDP_DEFAULT_IP6_SITE = 'FF05::C';
+export const SSDP_DEFAULT_IP6_ORG = 'FF08::C';
+export const SSDP_DEFAULT_IP6_GLOBAL = 'FF0E::C';
+export const SSDP_DEFAULT_PORT = 1900;

@@ -42,6 +42,13 @@ var nodeVersion = process.version.substr(1)
   , moduleVersion = require('../package.json').version
   , moduleName = require('../package.json').name
 
+export interface SSDPEvents
+{
+  on(event: 'advertise-alive', handler: (headers: Headers, rinfo: dgram.RemoteInfo) => void): this;
+  on(event: 'advertise-bye', handler: (headers: Headers, rinfo: dgram.RemoteInfo) => void): this;
+  on(event: 'response', handler: (headers: Headers, statusCode: number, rinfo: dgram.RemoteInfo) => void): this;
+}
+
 export type Headers = {
   MX?: number,
   NTS?: string,
@@ -95,7 +102,7 @@ export type SSDPLogger = (message: string, ...args: any[]) => void;
  * @returns {SSDP}
  * @constructor
  */
-export class SSDP extends EE
+export class SSDP extends EE implements SSDPEvents
 {
   constructor(opts?: SSDPOptions, protected _subclass: string = 'ssdp-base')
   {
@@ -437,7 +444,6 @@ export class SSDP extends EE
         this._logger('Unhandled NOTIFY event: %o', { 'message': msg, 'rinfo': rinfo })
     }
   }
-
 
 
   /**

@@ -133,12 +133,6 @@ export class SsdpServer extends SSDP
     this._adLoopInterval = null
   }
 
-
-
-  /**
-   *
-   * @param alive
-   */
   public advertise(alive)
   {
     var self = this
