@@ -15,3 +15,5 @@ coverage/
 .coveralls.yml
 reports/
 nbproject
+lib/*.js
+lib/*.js.map

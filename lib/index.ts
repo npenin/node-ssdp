@@ -58,6 +58,7 @@ export type Headers = {
   NT?: string;
   USN?: string;
   LOCATION?: string;
+  'CACHE-CONTROL'?: string;
   SERVER?: string;
 };
 

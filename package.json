@@ -1,6 +1,6 @@
 {
-  "name": "node-ssdp",
-  "description": "A node.js SSDP client and server library.",
+  "name": "ssdp-ts",
+  "description": "A node.js SSDP client and server library in typescript. (courtesy forked from node-ssdp)",
   "keywords": [
     "ssdp",
     "multicast",
@@ -8,8 +8,9 @@
     "device",
     "upnp"
   ],
+  "typings":"./index.d.ts",
   "version": "3.2.1",
-  "author": "Ilya Shaisultanov <ilya.shaisultanov@gmail.com>",
+  "author": "Nicolas Penin",
   "dependencies": {
     "@types/async": "^2.0.40",
     "@types/bluebird": "^3.5.8",
@@ -24,10 +25,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/diversario/node-ssdp.git"
+    "url": "git+ssh://git@github.com/npenin/node-ssdp.git"
   },
   "bugs": {
-    "url": "https://github.com/diversario/node-ssdp/issues"
+    "url": "https://github.com/npenin/node-ssdp/issues"
   },
   "main": "./index",
   "engines": {
@@ -44,7 +45,7 @@
     "test": "mocha --recursive test",
     "coverage": "istanbul cover node_modules/.bin/_mocha -- test/lib --recursive"
   },
-  "homepage": "https://github.com/diversario/node-ssdp#readme",
+  "homepage": "https://github.com/npenin/node-ssdp#readme",
   "directories": {
     "example": "example",
     "test": "test"

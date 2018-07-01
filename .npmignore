@@ -1,4 +1,7 @@
 .settings
 .project
-/node_modules
+node_modules
 .coveralls.yml
+
+!lib/*.js
+!lib/*.js.map
