@@ -274,7 +274,7 @@ export class SSDP extends EE implements SSDPEvents
       socket.on('message', function onSocketMessage(msg, rinfo)
       {
         self._logger('message %s', msg)
-        self._parseMessage(msg, rinfo)
+        self._parseMessage(msg, rinfo, iface)
       })
 
       socket.on('listening', function onSocketListening()
@@ -369,7 +369,7 @@ export class SSDP extends EE implements SSDPEvents
    * @param msg
    * @param rinfo
    */
-  protected _parseMessage(msg: Buffer, rinfo: dgram.RemoteInfo)
+  protected _parseMessage(msg: Buffer, rinfo: dgram.RemoteInfo, iface: string)
   {
     var message = msg.toString()
 
@@ -381,7 +381,7 @@ export class SSDP extends EE implements SSDPEvents
       this._parseResponse(message, rinfo)
     } else
     {
-      this._parseCommand(message, rinfo)
+      this._parseCommand(message, rinfo, iface)
     }
   }
 
@@ -392,7 +392,7 @@ export class SSDP extends EE implements SSDPEvents
    * @param msg
    * @param rinfo
    */
-  private _parseCommand(msg: string, rinfo: dgram.RemoteInfo)
+  private _parseCommand(msg: string, rinfo: dgram.RemoteInfo, iface: string)
   {
     var method = this._getMethod(msg)
       , headers = this._getHeaders(msg)
@@ -403,7 +403,7 @@ export class SSDP extends EE implements SSDPEvents
         this._notify(headers, msg, rinfo)
         break
       case c.M_SEARCH:
-        this._msearch(headers, msg, rinfo)
+        this._msearch(headers, iface, rinfo)
         break
       default:
         this._logger('Unhandled command: %o', { 'message': msg, 'rinfo': rinfo })
@@ -454,13 +454,13 @@ export class SSDP extends EE implements SSDPEvents
    * @param msg
    * @param rinfo
    */
-  protected _msearch(headers: Headers, msg, rinfo: dgram.RemoteInfo)
+  protected _msearch(headers: Headers, iface: string, rinfo: dgram.RemoteInfo)
   {
     this._logger('SSDP M-SEARCH event: %o', { 'ST': headers.ST, 'address': rinfo.address, 'port': rinfo.port })
 
     if (!headers.MAN || !headers.MX || !headers.ST) return
 
-    this._respondToSearch(headers.ST, rinfo)
+    this._respondToSearch(headers.ST, rinfo, iface)
   }
 
 
@@ -472,7 +472,7 @@ export class SSDP extends EE implements SSDPEvents
    * @param {Object} rinfo Remote client's address
    * @private
    */
-  private _respondToSearch(serviceType: string, rinfo: dgram.RemoteInfo)
+  private _respondToSearch(serviceType: string, rinfo: dgram.RemoteInfo, iface: string)
   {
     var self = this
       , peer_addr = rinfo.address
@@ -516,7 +516,7 @@ export class SSDP extends EE implements SSDPEvents
           '200 OK', extend({
             'ST': serviceType === c.SSDP_ALL ? usn : serviceType,
             'USN': udn,
-            'LOCATION': self._location,
+            'LOCATION': self._location && self._location.replace(/0\.0\.0\.0/, iface),
             'CACHE-CONTROL': 'max-age=' + self.options.ttl,
             'DATE': new Date().toUTCString(),
             'SERVER': self.options.ssdpSig,

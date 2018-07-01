@@ -35,7 +35,7 @@ export class SsdpServer extends SSDP
 
   constructor(opts?: SSDPOptions)
   {
-    super(opts, 'node-ssdp:server');
+    super(opts, 'ssdp-ts:server');
   }
 
   private _adLoopInterval: number;

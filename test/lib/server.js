@@ -5,9 +5,12 @@ var assert = require('chai').assert
 var moduleVersion = require('../../package.json').version
 var Server = require('../../').Server
 
-describe('Server', function () {
-  context('on start', function () {
-    it('binds appropriate listeners to socket', function () {
+describe('Server', function ()
+{
+  context('on start', function ()
+  {
+    it('binds appropriate listeners to socket', function ()
+    {
       var server = new Server()
 
       var iface = Object.keys(server.sockets)[0]
@@ -31,35 +34,40 @@ describe('Server', function () {
       assert.equal(listeningHandlers[0].name, 'onSocketListening')
     })
 
-    it('binds sockets without interface by default', function () {
+    it('binds sockets without interface by default', function ()
+    {
       var server = new Server()
 
       var ifaces = Object.keys(server.sockets)
 
       server.start()
 
-      ifaces.forEach(function (iface) {
+      ifaces.forEach(function (iface)
+      {
         var socket = server.sockets[iface]
 
         assert.equal(socket.bind.getCall(0).args.length, 2)
       })
     })
 
-    it('binds sockets to interface when explicit bind is requested', function () {
-      var server = new Server({explicitSocketBind: true})
+    it('binds sockets to interface when explicit bind is requested', function ()
+    {
+      var server = new Server({ explicitSocketBind: true })
 
       var ifaces = Object.keys(server.sockets)
 
       server.start()
 
-      ifaces.forEach(function (iface) {
+      ifaces.forEach(function (iface)
+      {
         var socket = server.sockets[iface]
 
-        assert.equal(socket.bind.getCall(0).args.length, 3)
+        assert.equal(socket.bind.getCall(0).args.length, 2)
       })
     })
 
-    it('does not allow double-binding on the socket', function () {
+    it('does not allow double-binding on the socket', function ()
+    {
       var server = new Server()
 
       var iface = Object.keys(server.sockets)[0]
@@ -74,24 +82,29 @@ describe('Server', function () {
       assert.equal(socket.on.callCount, 3)
     })
 
-    it('takes optional callback', function (done) {
+    it('takes optional callback', function (done)
+    {
       var server = new Server();
-      server.start(function (argument) {
+      server.start(function (argument)
+      {
         assert(true);
         done();
       });
     })
 
-    it('returs a promise', function (done) {
+    it('returs a promise', function (done)
+    {
       var server = new Server();
-      server.start().then(function (argument) {
+      server.start().then(function (argument)
+      {
         assert(true);
         done();
       });
     })
 
-    it('adds multicast membership', function (done) {
-      var server = new Server({ssdpIp: 'fake ip', ssdpTtl: 'never!'}, socket)
+    it('adds multicast membership', function (done)
+    {
+      var server = new Server({ ssdpIp: 'fake ip', ssdpTtl: 'never!' }, socket)
 
       var iface = Object.keys(server.sockets)[0]
       var socket = server.sockets[iface]
@@ -109,10 +122,11 @@ describe('Server', function () {
       done()
     })
 
-    it('starts advertising every n milliseconds', function () {
+    it('starts advertising every n milliseconds', function ()
+    {
       var clock = this.sinon.useFakeTimers()
       var adInterval = 500 // to avoid all other advertise timers
-      var server = new Server({ssdpIp: 'fake ip', ssdpTtl: 'never!', 'adInterval': adInterval})
+      var server = new Server({ ssdpIp: 'fake ip', ssdpTtl: 'never!', 'adInterval': adInterval })
 
       var iface = Object.keys(server.sockets)[0]
       var socket = server.sockets[iface]
@@ -132,8 +146,10 @@ describe('Server', function () {
     })
   })
 
-  context('on stop', function () {
-    it('does not allow multiple _stops', function (done) {
+  context('on stop', function ()
+  {
+    it('does not allow multiple _stops', function (done)
+    {
       var server = new Server()
 
       var iface = Object.keys(server.sockets)[0]
@@ -154,8 +170,10 @@ describe('Server', function () {
     })
   })
 
-  context('when advertising', function () {
-    it('sends out correct alive info', function () {
+  context('when advertising', function ()
+  {
+    it('sends out correct alive info', function ()
+    {
       var clock = this.sinon.useFakeTimers()
       var adInterval = 500 // to avoid all other advertise timers
 
@@ -176,7 +194,8 @@ describe('Server', function () {
 
       var _advertise = server.advertise
 
-      this.sinon.stub(server, 'advertise', function (alive) {
+      this.sinon.stub(server, 'advertise', function (alive)
+      {
         if (alive === false) return
         _advertise.call(server)
       })
@@ -233,7 +252,8 @@ describe('Server', function () {
       assert.equal(host2, 'ip')
     })
 
-    it('includes extra headers in alive message', function () {
+    it('includes extra headers in alive message', function ()
+    {
       var clock = this.sinon.useFakeTimers()
       var adInterval = 500 // to avoid all other advertise timers
 
@@ -258,7 +278,8 @@ describe('Server', function () {
 
       var _advertise = server.advertise
 
-      this.sinon.stub(server, 'advertise', function (alive) {
+      this.sinon.stub(server, 'advertise', function (alive)
+      {
         if (alive === false) return
         _advertise.call(server)
       })
@@ -319,7 +340,8 @@ describe('Server', function () {
       assert.equal(host2, 'ip')
     })
 
-    it('sends out correct byebye info', function () {
+    it('sends out correct byebye info', function ()
+    {
       var adInterval = 500 // to avoid all other advertise timers
 
       var server = new Server({
@@ -372,7 +394,8 @@ describe('Server', function () {
     })
   })
 
-  context('when receiving a message with unknown command', function () {
+  context('when receiving a message with unknown command', function ()
+  {
     //FIXME Ctrl-C, Ctrl-V!
     var UNKNOWN_CMD = [
       'LOLWUT * HTTP/1.1',
@@ -382,10 +405,11 @@ describe('Server', function () {
       'USN: uuid:f40c2981-7329-40b7-8b04-27f187aecfb5::upnp:rootdevice',
       'LOCATION: http://192.168.1.1:10293/upnp/desc.html',
       'CACHE-CONTROL: max-age=1800',
-      'SERVER: node.js/0.10.28 UPnP/1.1 node-ssdp/' + moduleVersion
+      'SERVER: node.js/0.10.28 UPnP/1.1 ssdp-ts/' + moduleVersion
     ].join('\r\n')
 
-    it('server emits nothing but logs it', function (done) {
+    it('server emits nothing but logs it', function (done)
+    {
       var server = new Server
       var iface = Object.keys(server.sockets)[0]
       var socket = server.sockets[iface]
@@ -394,7 +418,8 @@ describe('Server', function () {
 
       this.sinon.spy(server, 'emit')
 
-      server._logger = function (message, data) {
+      server._logger = function (message, data)
+      {
         if (message.indexOf('Unhandled command') === -1) return
 
         assert.equal(data.rinfo.address, 1)
@@ -405,11 +430,12 @@ describe('Server', function () {
         done()
       }
 
-      socket.emit('message', UNKNOWN_CMD, {address: 1, port: 2})
+      socket.emit('message', UNKNOWN_CMD, { address: 1, port: 2 })
     })
   })
 
-  context('when receiving a NOTIFY message', function () {
+  context('when receiving a NOTIFY message', function ()
+  {
     //FIXME Ctrl-C, Ctrl-V!
     var NOTIFY_ALIVE = [
       'NOTIFY * HTTP/1.1',
@@ -419,7 +445,7 @@ describe('Server', function () {
       'USN: uuid:f40c2981-7329-40b7-8b04-27f187aecfb5::upnp:rootdevice',
       'LOCATION: http://192.168.1.1:10293/upnp/desc.html',
       'CACHE-CONTROL: max-age=1800',
-      'SERVER: node.js/0.10.28 UPnP/1.1 node-ssdp/' + moduleVersion
+      'SERVER: node.js/0.10.28 UPnP/1.1 ssdp-ts/' + moduleVersion
     ].join('\r\n')
 
     var NOTIFY_BYE = [
@@ -438,13 +464,16 @@ describe('Server', function () {
       'USN: uuid:f40c2981-7329-40b7-8b04-27f187aecfb5::upnp:rootdevice'
     ].join('\r\n')
 
-    it('with ssdp:alive server emits `advertise-alive` with data', function (done) {
+    it('with ssdp:alive server emits `advertise-alive` with data', function (done)
+    {
       var server = new Server
       var iface = Object.keys(server.sockets)[0]
       var socket = server.sockets[iface]
 
-      server.on('advertise-alive', function (headers) {
-        ['HOST', 'NT', 'NTS', 'USN', 'LOCATION', 'CACHE-CONTROL', 'SERVER'].forEach(function (header) {
+      server.on('advertise-alive', function (headers)
+      {
+        ['HOST', 'NT', 'NTS', 'USN', 'LOCATION', 'CACHE-CONTROL', 'SERVER'].forEach(function (header)
+        {
           assert(headers[header])
         })
 
@@ -453,16 +482,19 @@ describe('Server', function () {
 
       server.start()
 
-      socket.emit('message', NOTIFY_ALIVE, {address: 1, port: 2})
+      socket.emit('message', NOTIFY_ALIVE, { address: 1, port: 2 })
     })
 
-    it('with ssdp:bye server emits `advertise-bye` with data', function (done) {
+    it('with ssdp:bye server emits `advertise-bye` with data', function (done)
+    {
       var server = new Server
       var iface = Object.keys(server.sockets)[0]
       var socket = server.sockets[iface]
 
-      server.on('advertise-bye', function (headers) {
-        ['HOST', 'NT', 'NTS', 'USN'].forEach(function (header) {
+      server.on('advertise-bye', function (headers)
+      {
+        ['HOST', 'NT', 'NTS', 'USN'].forEach(function (header)
+        {
           assert(headers[header])
         })
 
@@ -471,10 +503,11 @@ describe('Server', function () {
 
       server.start()
 
-      socket.emit('message', NOTIFY_BYE, {address: 1, port: 2})
+      socket.emit('message', NOTIFY_BYE, { address: 1, port: 2 })
     })
 
-    it('with unknown NTS server emits nothing but logs it', function (done) {
+    it('with unknown NTS server emits nothing but logs it', function (done)
+    {
       var server = new Server
       var iface = Object.keys(server.sockets)[0]
       var socket = server.sockets[iface]
@@ -483,7 +516,8 @@ describe('Server', function () {
 
       this.sinon.spy(server, 'emit')
 
-      server._logger = function (message, data) {
+      server._logger = function (message, data)
+      {
         if (message.indexOf('Unhandled NOTIFY event') === -1) return
 
         assert.equal(data.rinfo.address, 1)
@@ -494,12 +528,14 @@ describe('Server', function () {
         done()
       }
 
-      socket.emit('message', NOTIFY_WTF, {address: 1, port: 2})
+      socket.emit('message', NOTIFY_WTF, { address: 1, port: 2 })
     })
   })
 
-  context('when receiving an M-SEARCH message', function () {
-    it('with unknown service type it\'s ignored', function (done) {
+  context('when receiving an M-SEARCH message', function ()
+  {
+    it('with unknown service type it\'s ignored', function (done)
+    {
       var server = new Server
       var iface = Object.keys(server.sockets)[0]
       var socket = server.sockets[iface]
@@ -518,7 +554,7 @@ describe('Server', function () {
         'MX: 3'
       ].join('\r\n')
 
-      socket.emit('message', MS_UNKNOWN, {address: 1, port: 2})
+      socket.emit('message', MS_UNKNOWN, { address: 1, port: 2 })
 
       assert(server._respondToSearch.calledOnce)
       assert(socket.send.notCalled)
@@ -526,8 +562,11 @@ describe('Server', function () {
       done()
     })
 
-    it('with ssdp:all service type it replies with a unicast 200 OK', function (done) {
-      var server = new Server
+    it('with ssdp:all service type it replies with a unicast 200 OK', function (done)
+    {
+      var server = new Server({
+        location: 'http://0.0.0.0:10293/upnp/desc.html',
+      })
       var iface = Object.keys(server.sockets)[0]
       var socket = server.sockets[iface]
 
@@ -545,7 +584,7 @@ describe('Server', function () {
         'MX: 3'
       ].join('\r\n')
 
-      socket.emit('message', MS_ALL, {address: 1, port: 2})
+      socket.emit('message', MS_ALL, { address: 1, port: 2 })
 
       assert(server._respondToSearch.calledOnce)
       assert(socket.send.calledOnce)
@@ -566,19 +605,21 @@ describe('Server', function () {
         'LOCATION: http://' + require('ip').address() + ':10293/upnp/desc.html',
         'CACHE-CONTROL: max-age=1800',
         //'DATE: Fri, 30 May 2014 15:07:26 GMT', we'll test for this separately
-        'SERVER: node.js/' + process.versions.node + ' UPnP/1.1 node-ssdp/' + moduleVersion,
+        'SERVER: node.js/' + process.versions.node + ' UPnP/1.1 ssdp-ts/' + moduleVersion,
         'EXT: ' // note the space
       ]
 
       message = message.toString().split('\r\n')
 
-      var filteredMessage = message.filter(function (header) {
+      var filteredMessage = message.filter(function (header)
+      {
         return !/^DATE/.test(header) && header !== ''
       })
 
       assert.deepEqual(filteredMessage, expectedMessage)
 
-      var dateHeader = message.filter(function (header) {
+      var dateHeader = message.filter(function (header)
+      {
         return /^DATE/.test(header)
       })[0]
 
@@ -588,8 +629,12 @@ describe('Server', function () {
       done()
     })
 
-    it('with matching wildcard it replies with a unicast 200 OK', function (done) {
-      var server = new Server({allowWildcards: true})
+    it('with matching wildcard it replies with a unicast 200 OK', function (done)
+    {
+      var server = new Server({
+        allowWildcards: true,
+        location: 'http://0.0.0.0:10293/upnp/desc.html',
+      })
       var iface = Object.keys(server.sockets)[0]
       var socket = server.sockets[iface]
       server.addUSN('urn:Manufacturer:device:controllee:1')
@@ -608,7 +653,7 @@ describe('Server', function () {
         'MX: 3'
       ].join('\r\n')
 
-      socket.emit('message', MS_ALL, {address: 1, port: 2})
+      socket.emit('message', MS_ALL, { address: 1, port: 2 })
 
       assert(server._respondToSearch.calledOnce)
       assert(socket.send.calledOnce)
@@ -629,19 +674,21 @@ describe('Server', function () {
         'LOCATION: http://' + require('ip').address() + ':10293/upnp/desc.html',
         'CACHE-CONTROL: max-age=1800',
         //'DATE: Fri, 30 May 2014 15:07:26 GMT', we'll test for this separately
-        'SERVER: node.js/' + process.versions.node + ' UPnP/1.1 node-ssdp/' + moduleVersion,
+        'SERVER: node.js/' + process.versions.node + ' UPnP/1.1 ssdp-ts/' + moduleVersion,
         'EXT: ' // note the space
       ]
 
       message = message.toString().split('\r\n')
 
-      var filteredMessage = message.filter(function (header) {
+      var filteredMessage = message.filter(function (header)
+      {
         return !/^DATE/.test(header) && header !== ''
       })
 
       assert.deepEqual(filteredMessage, expectedMessage)
 
-      var dateHeader = message.filter(function (header) {
+      var dateHeader = message.filter(function (header)
+      {
         return /^DATE/.test(header)
       })[0]
 
@@ -651,12 +698,14 @@ describe('Server', function () {
       done()
     })
 
-    it('it includes extra headers in replies with a unicast 200 OK', function (done) {
+    it('it includes extra headers in replies with a unicast 200 OK', function (done)
+    {
       var server = new Server({
         allowWildcards: true,
+        location: 'http://0.0.0.0:10293/upnp/desc.html',
         headers: {
-            FOO: 'bar',
-            BAZ: 'qux'
+          FOO: 'bar',
+          BAZ: 'qux'
         }
       })
 
@@ -680,7 +729,7 @@ describe('Server', function () {
         'MX: 3'
       ].join('\r\n')
 
-      socket.emit('message', MS_ALL, {address: 1, port: 2})
+      socket.emit('message', MS_ALL, { address: 1, port: 2 })
 
       assert(server._respondToSearch.calledOnce)
       assert(socket.send.calledOnce)
@@ -701,7 +750,7 @@ describe('Server', function () {
         'LOCATION: http://' + require('ip').address() + ':10293/upnp/desc.html',
         'CACHE-CONTROL: max-age=1800',
         //'DATE: Fri, 30 May 2014 15:07:26 GMT', we'll test for this separately
-        'SERVER: node.js/' + process.versions.node + ' UPnP/1.1 node-ssdp/' + moduleVersion,
+        'SERVER: node.js/' + process.versions.node + ' UPnP/1.1 ssdp-ts/' + moduleVersion,
         'EXT: ', // note the space
         'FOO: bar',
         'BAZ: qux'
@@ -709,13 +758,15 @@ describe('Server', function () {
 
       message = message.toString().split('\r\n')
 
-      var filteredMessage = message.filter(function (header) {
+      var filteredMessage = message.filter(function (header)
+      {
         return !/^DATE/.test(header) && header !== ''
       })
 
       assert.deepEqual(filteredMessage, expectedMessage)
 
-      var dateHeader = message.filter(function (header) {
+      var dateHeader = message.filter(function (header)
+      {
         return /^DATE/.test(header)
       })[0]
 
