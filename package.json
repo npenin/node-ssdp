@@ -43,7 +43,8 @@
   },
   "scripts": {
     "test": "mocha --recursive test",
-    "coverage": "istanbul cover node_modules/.bin/_mocha -- test/lib --recursive"
+    "coverage": "istanbul cover node_modules/.bin/_mocha -- test/lib --recursive",
+    "prepublishOnly": "tsc -p ."
   },
   "homepage": "https://github.com/npenin/node-ssdp#readme",
   "directories": {
