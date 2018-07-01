@@ -8,7 +8,7 @@
     "device",
     "upnp"
   ],
-  "typings":"./index.d.ts",
+  "typings": "./index.d.ts",
   "version": "3.2.1",
   "author": "Nicolas Penin",
   "dependencies": {
