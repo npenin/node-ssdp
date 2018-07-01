@@ -9,7 +9,7 @@
     "upnp"
   ],
   "typings": "./index.d.ts",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "author": "Nicolas Penin",
   "dependencies": {
     "@types/async": "^2.0.40",
