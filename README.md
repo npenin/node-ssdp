@@ -15,7 +15,7 @@ There is another package called `ssdp` which is the original unmaintained versio
 ## Usage - Client
 
 ```javascript
-    var Client = require('node-ssdp').Client
+    var Client = require('ssdp-st').Client
       , client = new Client();
 
     client.on('response', function (headers, statusCode, rinfo) {
@@ -33,7 +33,7 @@ There is another package called `ssdp` which is the original unmaintained versio
 ## Usage - Server
 
 ```javascript
-    var Server = require('node-ssdp').Server
+    var Server = require('ssdp-ts').Server
       , server = new Server()
     ;
 
