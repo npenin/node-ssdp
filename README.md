@@ -15,7 +15,7 @@ There is another package called `ssdp` which is the original unmaintained versio
 ## Usage - Client
 
 ```javascript
-    var Client = require('ssdp-st').Client
+    var Client = require('ssdp-ts').Client
       , client = new Client();
 
     client.on('response', function (headers, statusCode, rinfo) {
